@@ -8,9 +8,10 @@ project can understand where fields map back to acceptance criteria.
 No methods implement business logic; helpers should be added in
 `consolidation`, `normalization`, or `reports` modules as appropriate.
 """
+
 from dataclasses import dataclass, field
-from datetime import datetime, date
-from typing import Optional, List, Dict, Any
+from datetime import date, datetime
+from typing import Any
 
 
 @dataclass
@@ -25,8 +26,8 @@ class Lot:
     """
 
     lot_id: str
-    created_at: Optional[datetime] = None
-    notes: Optional[str] = None
+    created_at: datetime | None = None
+    notes: str | None = None
 
 
 @dataclass
@@ -39,12 +40,12 @@ class LotAlias:
 
     lot_id_raw: str
     source_system: str  # e.g., 'production', 'shipping', 'quality'
-    source_file: Optional[str] = None
-    sheet_name: Optional[str] = None
-    row_number: Optional[int] = None
-    first_seen_at: Optional[datetime] = None
-    last_seen_at: Optional[datetime] = None
-    canonical_lot_id: Optional[str] = None  # filled after normalization
+    source_file: str | None = None
+    sheet_name: str | None = None
+    row_number: int | None = None
+    first_seen_at: datetime | None = None
+    last_seen_at: datetime | None = None
+    canonical_lot_id: str | None = None  # filled after normalization
 
 
 @dataclass
@@ -55,20 +56,20 @@ class ProductionRun:
     production_line), and AC-9 (drill-down by production line).
     """
 
-    source_file: Optional[str]
-    row_number: Optional[int]
+    source_file: str | None
+    row_number: int | None
     lot_raw: str
-    canonical_lot_id: Optional[str]
-    production_line: Optional[str]
-    part_number: Optional[str]
-    run_date: Optional[date]
-    shift: Optional[str]
-    units_planned: Optional[int]
-    units_actual: Optional[int]
-    downtime_min: Optional[int]
-    line_issue_flag: Optional[bool]
-    primary_issue: Optional[str]
-    supervisor_notes: Optional[str]
+    canonical_lot_id: str | None
+    production_line: str | None
+    part_number: str | None
+    run_date: date | None
+    shift: str | None
+    units_planned: int | None
+    units_actual: int | None
+    downtime_min: int | None
+    line_issue_flag: bool | None
+    primary_issue: str | None
+    supervisor_notes: str | None
 
 
 @dataclass
@@ -78,13 +79,13 @@ class ShipmentLine:
     Includes `ship_date` and `ship_status` to support AC-13..AC-15 and drill-down.
     """
 
-    source_file: Optional[str]
-    row_number: Optional[int]
+    source_file: str | None
+    row_number: int | None
     lot_raw: str
-    canonical_lot_id: Optional[str]
-    qty_shipped: Optional[int]
-    ship_date: Optional[date]
-    ship_status: Optional[str]
+    canonical_lot_id: str | None
+    qty_shipped: int | None
+    ship_date: date | None
+    ship_status: str | None
 
 
 @dataclass
@@ -97,10 +98,10 @@ class SourceReference:
     - `raw_values`: the raw row data as a mapping of column->value
     """
 
-    file_name: Optional[str]
-    sheet_name: Optional[str]
-    row_number: Optional[int]
-    raw_values: Dict[str, Any] = field(default_factory=dict)
+    file_name: str | None
+    sheet_name: str | None
+    row_number: int | None
+    raw_values: dict[str, Any] = field(default_factory=dict)
 
 
 __all__ = ["Lot", "LotAlias", "ProductionRun", "ShipmentLine", "SourceReference"]

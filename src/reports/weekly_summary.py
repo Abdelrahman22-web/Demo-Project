@@ -6,8 +6,9 @@ responsibilities map to AC-6 through AC-9 and AC-18 (export). The generator
 should be given consolidated, canonicalized rows (e.g., output of
 `Consolidator.consolidate`) and compute ranking by production line.
 """
-from typing import List, Dict, Any, Tuple
+
 from datetime import date
+from typing import Any
 
 
 class WeeklySummaryGenerator:
@@ -26,11 +27,15 @@ class WeeklySummaryGenerator:
       of lot ids or row references) for AC-9.
     """
 
-    def __init__(self, *, issue_rule_description: str = "line_issue_flag == True") -> None:
+    def __init__(
+        self, *, issue_rule_description: str = "line_issue_flag == True"
+    ) -> None:
         # Human-readable description of how an "issue" is determined (AC-6)
         self.issue_rule_description = issue_rule_description
 
-    def generate(self, canonical_rows: List[Dict[str, Any]], week_start: date, week_end: date) -> Dict[str, Any]:
+    def generate(
+        self, canonical_rows: list[dict[str, Any]], week_start: date, week_end: date
+    ) -> dict[str, Any]:
         """Return a summary dict containing ranking + metadata.
 
         Return structure suggestion (scaffold):

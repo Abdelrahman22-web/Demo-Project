@@ -5,10 +5,10 @@ This module contains the canonicalization API required by AC-3 and AC-4.
 It intentionally exposes a small surface: a single `canonicalize_lot_id`
 function and a `LotNormalizer` service stub for richer workflows.
 """
-from typing import Optional, List
 
 
-def canonicalize_lot_id(raw: str) -> Optional[str]:
+
+def canonicalize_lot_id(raw: str) -> str | None:
     """Return a canonical lot id for a raw input string.
 
     Requirements to satisfy (AC-3):
@@ -19,7 +19,9 @@ def canonicalize_lot_id(raw: str) -> Optional[str]:
     NOTE: This is a stub. The function should be deterministic and idempotent.
     """
 
-    raise NotImplementedError("canonicalize_lot_id must be implemented to normalize lot identifiers")
+    raise NotImplementedError(
+        "canonicalize_lot_id must be implemented to normalize lot identifiers"
+    )
 
 
 class LotNormalizer:
@@ -38,7 +40,7 @@ class LotNormalizer:
     def __init__(self, *, allow_guessing: bool = False) -> None:
         self.allow_guessing = allow_guessing
 
-    def normalize(self, raw: str) -> List[str]:
+    def normalize(self, raw: str) -> list[str]:
         """Return a list of candidate canonical ids for `raw`.
 
         - If normalization is unambiguous, return a single-item list.

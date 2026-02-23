@@ -6,8 +6,11 @@ by the acceptance criteria (AC-1, AC-2, AC-17). Implementations should use
 an appropriate library (e.g., `pandas`, `openpyxl`, or `csv`) depending on
 project constraints.
 """
-from typing import List, Dict, Any, Iterable, Tuple
+
+from collections.abc import Iterable
 from datetime import datetime
+from typing import Any
+
 from .models import SourceReference
 
 
@@ -39,7 +42,9 @@ class SpreadsheetLoader:
         # No heavy dependencies here; concrete implementations can add them.
         pass
 
-    def load_files(self, paths: Iterable[str]) -> Iterable[Tuple[Dict[str, Any], SourceReference]]:
+    def load_files(
+        self, paths: Iterable[str]
+    ) -> Iterable[tuple[dict[str, Any], SourceReference]]:
         """Yield (row_dict, SourceReference) tuples for every row in input files.
 
         - `paths`: iterable of file paths to load.
@@ -84,8 +89,8 @@ def parse_date(value: str) -> datetime:
         "%m-%d-%Y",
         "%b %d, %Y",  # Jan 2, 2025
         "%B %d, %Y",  # January 2, 2025
-        "%d %b %Y",   # 02 Jan 2025
-        "%d %B %Y",   # 2 January 2025
+        "%d %b %Y",  # 02 Jan 2025
+        "%d %B %Y",  # 2 January 2025
         "%Y-%m-%d %H:%M:%S",
         "%Y-%m-%dT%H:%M:%S",
     ]

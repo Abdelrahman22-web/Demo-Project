@@ -5,8 +5,10 @@ This module exposes an `Exporter` class with method stubs for exporting to
 CSV/XLSX. Implementations should use a library like `csv` for CSV and
 `openpyxl`/`xlsxwriter` for XLSX.
 """
-from typing import Iterable, Dict, Any, Optional
+
+from collections.abc import Iterable
 from pathlib import Path
+from typing import Any
 
 
 class Exporter:
@@ -20,10 +22,10 @@ class Exporter:
     - Return the path to the generated file and/or a bytes buffer.
     """
 
-    def __init__(self, output_dir: Optional[Path] = None) -> None:
+    def __init__(self, output_dir: Path | None = None) -> None:
         self.output_dir = Path(".") if output_dir is None else output_dir
 
-    def export_csv(self, rows: Iterable[Dict[str, Any]], filename: str) -> Path:
+    def export_csv(self, rows: Iterable[dict[str, Any]], filename: str) -> Path:
         """Export `rows` to CSV at `filename` inside `output_dir`.
 
         This is a stub; real implementations should ensure proper escaping,
@@ -32,7 +34,9 @@ class Exporter:
 
         raise NotImplementedError("Exporter.export_csv must be implemented")
 
-    def export_xlsx(self, tables: Dict[str, Iterable[Dict[str, Any]]], filename: str) -> Path:
+    def export_xlsx(
+        self, tables: dict[str, Iterable[dict[str, Any]]], filename: str
+    ) -> Path:
         """Export multiple named tables to a single XLSX file.
 
         - `tables`: mapping from sheet name -> iterable of row dicts.

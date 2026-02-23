@@ -5,8 +5,9 @@ This module contains `TrendingCalculator` which compares the selected week
 to a previous period (default: previous week) and returns counts + deltas
 required by AC-10 and AC-11. It also provides drill-down keys for AC-12.
 """
-from typing import List, Dict, Any
+
 from datetime import date
+from typing import Any
 
 
 class TrendingCalculator:
@@ -23,7 +24,14 @@ class TrendingCalculator:
     def __init__(self) -> None:
         pass
 
-    def compute(self, canonical_rows: List[Dict[str, Any]], week_start: date, week_end: date, prev_start: date, prev_end: date) -> Dict[str, Any]:
+    def compute(
+        self,
+        canonical_rows: list[dict[str, Any]],
+        week_start: date,
+        week_end: date,
+        prev_start: date,
+        prev_end: date,
+    ) -> dict[str, Any]:
         """Return a structure describing current counts, previous counts, and deltas.
 
         Suggested return scaffold:

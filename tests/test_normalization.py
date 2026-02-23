@@ -3,6 +3,7 @@
 Tests should eventually assert canonical forms and ambiguous-candidate
 behavior for `LotNormalizer`. For now they confirm the function is a stub.
 """
+
 import pytest
 
 from src import normalization

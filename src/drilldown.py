@@ -6,8 +6,9 @@ to enrich them with shipping status (AC-9, AC-12, AC-13, AC-14, AC-15).
 
 Functions are stubs and document the expected behavior and return shapes.
 """
-from typing import List, Dict, Any, Optional
+
 from datetime import date
+from typing import Any
 
 
 class DrillDownService:
@@ -28,7 +29,13 @@ class DrillDownService:
     def __init__(self) -> None:
         pass
 
-    def drilldown_by_production_line(self, production_line: str, week_start: date, week_end: date, include_flagged: bool = False) -> Dict[str, Any]:
+    def drilldown_by_production_line(
+        self,
+        production_line: str,
+        week_start: date,
+        week_end: date,
+        include_flagged: bool = False,
+    ) -> dict[str, Any]:
         """Return drill-down rows for a production line (AC-9).
 
         Expected return shape (scaffold):
@@ -51,7 +58,13 @@ class DrillDownService:
 
         raise NotImplementedError("drilldown_by_production_line must be implemented")
 
-    def drilldown_by_category(self, category: str, week_start: date, week_end: date, include_comparison: bool = False) -> Dict[str, Any]:
+    def drilldown_by_category(
+        self,
+        category: str,
+        week_start: date,
+        week_end: date,
+        include_comparison: bool = False,
+    ) -> dict[str, Any]:
         """Return drill-down rows for an issue/defect category (AC-12).
 
         If `include_comparison` is True, include rows from the comparison

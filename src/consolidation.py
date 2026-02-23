@@ -8,10 +8,12 @@ AC-1 through AC-5 and AC-16..AC-17.
 Only scaffolding is provided: each method documents its responsibility and
 raises `NotImplementedError` so implementers can fill logic incrementally.
 """
-from typing import Iterable, Dict, Any, List, Tuple
-from .models import ProductionRun, ShipmentLine, SourceReference, LotAlias
-from .parsers import SpreadsheetLoader
+
+from collections.abc import Iterable
+from typing import Any
+
 from .normalization import LotNormalizer
+from .parsers import SpreadsheetLoader
 
 
 class ConsolidationResult:
@@ -23,9 +25,9 @@ class ConsolidationResult:
     """
 
     def __init__(self):
-        self.rows: List[Dict[str, Any]] = []
-        self.needs_review: List[Dict[str, Any]] = []
-        self.errors: List[Dict[str, Any]] = []
+        self.rows: list[dict[str, Any]] = []
+        self.needs_review: list[dict[str, Any]] = []
+        self.errors: list[dict[str, Any]] = []
 
 
 class Consolidator:
@@ -49,7 +51,9 @@ class Consolidator:
         self.loader = loader
         self.normalizer = normalizer
 
-    def consolidate(self, file_paths: Iterable[str], *, include_flagged: bool = False) -> ConsolidationResult:
+    def consolidate(
+        self, file_paths: Iterable[str], *, include_flagged: bool = False
+    ) -> ConsolidationResult:
         """Run consolidation across provided `file_paths`.
 
         - `include_flagged`: when True, flagged rows (Needs Review) are
@@ -58,9 +62,13 @@ class Consolidator:
         Returns a `ConsolidationResult` with rows, needs_review, and errors.
         """
 
-        raise NotImplementedError("Consolidator.consolidate must be implemented to run import + normalization + matching")
+        raise NotImplementedError(
+            "Consolidator.consolidate must be implemented to run import + normalization + matching"
+        )
 
-    def _detect_conflicts(self, consolidated_rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _detect_conflicts(
+        self, consolidated_rows: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Inspect consolidated rows and return detected conflicts (AC-16).
 
         - Should compare key fields across rows that share a canonical_lot_id
