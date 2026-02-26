@@ -7,7 +7,6 @@ function and a `LotNormalizer` service stub for richer workflows.
 """
 
 
-
 def canonicalize_lot_id(raw: str) -> str | None:
     """Return a canonical lot id for a raw input string.
 
@@ -19,9 +18,29 @@ def canonicalize_lot_id(raw: str) -> str | None:
     NOTE: This is a stub. The function should be deterministic and idempotent.
     """
 
-    raise NotImplementedError(
-        "canonicalize_lot_id must be implemented to normalize lot identifiers"
-    )
+    if not raw or not isinstance(raw, str):
+        return None
+
+    # Strip leading/trailing whitespace
+    normalized = raw.strip()
+
+    if not normalized:
+        return None
+
+    # Uppercase and normalize separators
+    normalized = normalized.upper()
+    normalized = normalized.replace("_", "-")
+    normalized = normalized.replace("–", "-")  # en-dash to hyphen
+    normalized = normalized.replace("—", "-")  # em-dash to hyphen
+
+    # Convert spaces to hyphens (preserving structure like "LOT 456" → "LOT-456")
+    normalized = normalized.replace(" ", "-")
+
+    # Collapse multiple consecutive hyphens into single hyphen
+    while "--" in normalized:
+        normalized = normalized.replace("--", "-")
+
+    return normalized if normalized else None
 
 
 class LotNormalizer:
@@ -50,4 +69,11 @@ class LotNormalizer:
         This is a stub and must be implemented.
         """
 
-        raise NotImplementedError("LotNormalizer.normalize must be implemented")
+        canonical = canonicalize_lot_id(raw)
+        if canonical is None:
+            return []
+
+        # For now, return a single candidate (unambiguous case)
+        # If allow_guessing is True, could return multiple candidates
+        # for further review, but basic case is deterministic.
+        return [canonical]
