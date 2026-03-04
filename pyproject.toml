@@ -1,26 +1,53 @@
 [tool.poetry]
-name = "ops-weekly-summary"
+name = "demo-project"
 version = "0.1.0"
-description = "Weekly operations summary app for production issues, defect trends, and shipping drill-down."
-authors = ["Your Name <you@example.com>"]
-readme = "README.md"
-packages = [{ include = "ops_dashboard", from = "src" }]
+description = "Scaffolding for weekly summary reporting (course project)"
+authors = ["you <you@example.com>"]
+packages = [
+	{ include = "src" }
+]
 
 [tool.poetry.dependencies]
-python = "^3.11"
-pandas = "^2.2.3"
-openpyxl = "^3.1.5"
-streamlit = "^1.41.1"
-xlsxwriter = "^3.2.0"
-python-dateutil = "^2.9.0.post0"
+python = "^3.10"
+ruff = "^0.15.2"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]
+pytest = "^7.0"
+pytest-cov = "^7.0.0"
+pre-commit = "^4.5.1"
 
 [build-system]
-requires = ["poetry-core>=1.9.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88  # same as black default
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes: undefined names, unused imports, etc.
+    "I",   # isort: import ordering
+    "B",   # flake8-bugbear: common bug patterns
+    "UP",  # pyupgrade: use modern Python syntax
+]
+ignore = [
+    "E501",  # line too long - handled by formatter, not linter
+    "B008",  # do not perform function call in default args (common in FastAPI/Streamlit)
+]
+
+# files/dirs to skip
+exclude = [
+    ".venv",
+    "__pycache__",
+    "migrations",
+    "alembic",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "core", "utils", "services"]  # your own modules
+
+[tool.ruff.format]
+quote-style = "double"        # consistent with black
+indent-style = "space"
+skip-magic-trailing-comma = false

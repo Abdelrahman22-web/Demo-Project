@@ -1,0 +1,79 @@
+"""
+Normalization helpers for Lot ID canonicalization.
+
+This module contains the canonicalization API required by AC-3 and AC-4.
+It intentionally exposes a small surface: a single `canonicalize_lot_id`
+function and a `LotNormalizer` service stub for richer workflows.
+"""
+
+
+def canonicalize_lot_id(raw: str) -> str | None:
+    """Return a canonical lot id for a raw input string.
+
+    Requirements to satisfy (AC-3):
+    - Normalize whitespace, hyphens, underscores, and case differences.
+    - Handle common typos (e.g., replace letter 'O' vs digit '0' where safe).
+    - Return `None` if the input is clearly invalid / cannot be normalized.
+
+    NOTE: This is a stub. The function should be deterministic and idempotent.
+    """
+
+    if not raw or not isinstance(raw, str):
+        return None
+
+    # Strip leading/trailing whitespace
+    normalized = raw.strip()
+
+    if not normalized:
+        return None
+
+    # Uppercase and normalize separators
+    normalized = normalized.upper()
+    normalized = normalized.replace("_", "-")
+    normalized = normalized.replace("–", "-")  # en-dash to hyphen
+    normalized = normalized.replace("—", "-")  # em-dash to hyphen
+
+    # Convert spaces to hyphens (preserving structure like "LOT 456" → "LOT-456")
+    normalized = normalized.replace(" ", "-")
+
+    # Collapse multiple consecutive hyphens into single hyphen
+    while "--" in normalized:
+        normalized = normalized.replace("--", "-")
+
+    return normalized if normalized else None
+
+
+class LotNormalizer:
+    """Service wrapper for canonicalization workflows.
+
+    Responsibilities:
+    - Provide batch normalization utilities.
+    - Track ambiguous results (AC-5) and return candidates when ambiguous.
+    - Expose configuration for typo rules and normalization steps.
+
+    The implementation should avoid writing to a DB; it should only perform
+    in-memory transformations and return structured results that higher-level
+    services (consolidation) can persist or flag.
+    """
+
+    def __init__(self, *, allow_guessing: bool = False) -> None:
+        self.allow_guessing = allow_guessing
+
+    def normalize(self, raw: str) -> list[str]:
+        """Return a list of candidate canonical ids for `raw`.
+
+        - If normalization is unambiguous, return a single-item list.
+        - If ambiguous, return multiple candidates so the caller can flag
+          the record as `Needs Review` (AC-5).
+
+        This is a stub and must be implemented.
+        """
+
+        canonical = canonicalize_lot_id(raw)
+        if canonical is None:
+            return []
+
+        # For now, return a single candidate (unambiguous case)
+        # If allow_guessing is True, could return multiple candidates
+        # for further review, but basic case is deterministic.
+        return [canonical]
