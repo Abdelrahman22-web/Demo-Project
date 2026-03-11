@@ -6,3 +6,4 @@ def test_load_settings_uses_test_env_file():
 
     assert settings.app_env == "test"
     assert settings.test_database_url == "sqlite:///./ops_test.db"
+    assert settings.log_level == "INFO"

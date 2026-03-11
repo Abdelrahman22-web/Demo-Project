@@ -1,11 +1,14 @@
 """Export utilities for weekly summary and drill-down outputs."""
 
 import csv
+import logging
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
 from openpyxl import Workbook
+
+logger = logging.getLogger(__name__)
 
 
 class Exporter:
@@ -31,6 +34,7 @@ class Exporter:
             for row in rows:
                 writer.writerow(row)
 
+        logger.info("Exported CSV file to %s with %d rows", target, len(rows))
         return target
 
     def export_xlsx(
@@ -46,6 +50,9 @@ class Exporter:
             worksheet = workbook.create_sheet(title=str(sheet_name)[:31] or "Sheet1")
             rows = list(rows)
             if not rows:
+                logger.debug(
+                    "Created empty worksheet '%s' in %s", worksheet.title, target
+                )
                 continue
 
             headers: list[str] = []
@@ -59,4 +66,5 @@ class Exporter:
                 worksheet.append([row.get(header) for header in headers])
 
         workbook.save(target)
+        logger.info("Exported XLSX file to %s", target)
         return target
