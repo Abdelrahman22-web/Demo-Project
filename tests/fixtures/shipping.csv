@@ -1,0 +1,4 @@
+ship_date,raw_lot_id,normalized_lot_id,sales_order,customer,destination_state,carrier,bol,tracking_pro,qty_shipped,ship_status,hold_reason,shipping_notes
+2026-01-15,LOT-20260112-001,LOT-20260112-001,SO-10001,Acme,IN,XPO,BOL-1,TRACK-1,96,Shipped,,Delivered
+2026-01-16,LOT-20260113-002,LOT-20260113-002,SO-10002,Acme,OH,XPO,BOL-2,TRACK-2,118,On Hold,Paperwork missing,Awaiting documents
+2026-01-08,LOT-20260106-001,LOT-20260106-001,SO-10003,Acme,IL,XPO,BOL-3,TRACK-3,80,Partial,,Split shipment

@@ -1,46 +1,62 @@
-"""
-Export utilities for weekly summary and drill-down exports (AC-18, AC-19).
+"""Export utilities for weekly summary and drill-down outputs."""
 
-This module exposes an `Exporter` class with method stubs for exporting to
-CSV/XLSX. Implementations should use a library like `csv` for CSV and
-`openpyxl`/`xlsxwriter` for XLSX.
-"""
-
+import csv
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from openpyxl import Workbook
+
 
 class Exporter:
-    """Simple export interface.
-
-    Responsibilities:
-    - Export ranking + trending tables including metadata (week range, timestamp)
-      (AC-18).
-    - Export drill-down result rows including shipping status fields used to
-      answer "has it shipped?" (AC-19).
-    - Return the path to the generated file and/or a bytes buffer.
-    """
+    """Write tabular data to CSV and XLSX files."""
 
     def __init__(self, output_dir: Path | None = None) -> None:
         self.output_dir = Path(".") if output_dir is None else output_dir
 
     def export_csv(self, rows: Iterable[dict[str, Any]], filename: str) -> Path:
-        """Export `rows` to CSV at `filename` inside `output_dir`.
+        rows = list(rows)
+        target = self.output_dir / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
 
-        This is a stub; real implementations should ensure proper escaping,
-        consistent column ordering, and include metadata rows when required.
-        """
+        headers: list[str] = []
+        for row in rows:
+            for key in row:
+                if key not in headers:
+                    headers.append(key)
 
-        raise NotImplementedError("Exporter.export_csv must be implemented")
+        with target.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=headers)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(row)
+
+        return target
 
     def export_xlsx(
         self, tables: dict[str, Iterable[dict[str, Any]]], filename: str
     ) -> Path:
-        """Export multiple named tables to a single XLSX file.
+        target = self.output_dir / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
 
-        - `tables`: mapping from sheet name -> iterable of row dicts.
-        - `filename`: target filename (no path). Returns the full Path.
-        """
+        workbook = Workbook()
+        workbook.remove(workbook.active)
 
-        raise NotImplementedError("Exporter.export_xlsx must be implemented")
+        for sheet_name, rows in tables.items():
+            worksheet = workbook.create_sheet(title=str(sheet_name)[:31] or "Sheet1")
+            rows = list(rows)
+            if not rows:
+                continue
+
+            headers: list[str] = []
+            for row in rows:
+                for key in row:
+                    if key not in headers:
+                        headers.append(key)
+
+            worksheet.append(headers)
+            for row in rows:
+                worksheet.append([row.get(header) for header in headers])
+
+        workbook.save(target)
+        return target
