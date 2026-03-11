@@ -1,0 +1,4 @@
+production_date,shift,production_line,raw_lot_id,normalized_lot_id,part_number,units_planned,units_actual,downtime_min,line_issue,primary_issue,supervisor_notes
+2026-01-12,Day,Line 1,LOT 20260112 001,LOT-20260112-001,SW-1000-A,100,96,20,true,Tool wear,Replaced tool
+2026-01-13,Night,Line 2,L0T-20260113-002,LOT-20260113-002,SW-1000-B,120,118,5,false,,
+2026-01-06,Day,Line 1,LOT20260106001,LOT-20260106-001,SW-1000-C,90,80,35,true,Sensor fault,Calibrated sensor
