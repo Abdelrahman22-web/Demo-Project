@@ -189,7 +189,14 @@ jobs:
 
 
       # ------------------------------------------------------
-      # Step 8: Run pre-commit
+      # Step 8: Install Playwright browsers
+      # ------------------------------------------------------
+      - name: Install Playwright browsers
+        run: poetry run playwright install --with-deps chromium
+
+
+      # ------------------------------------------------------
+      # Step 9: Run pre-commit
       # ------------------------------------------------------
       - name: Run pre-commit on all files
 
