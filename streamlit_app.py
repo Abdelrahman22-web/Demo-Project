@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import tempfile
 from datetime import date, timedelta
 from io import BytesIO
@@ -11,6 +12,7 @@ import streamlit as st
 from src.config import load_settings
 from src.consolidation import Consolidator
 from src.exporter import Exporter
+from src.logging_config import configure_logging
 from src.normalization import LotNormalizer
 from src.parsers import SpreadsheetLoader
 from src.reports.trending import TrendingCalculator
@@ -18,11 +20,14 @@ from src.reports.weekly_summary import WeeklySummaryGenerator
 
 st.set_page_config(page_title="Ops Weekly Summary", layout="wide")
 
+logger = logging.getLogger(__name__)
+
 
 def _save_upload(upload) -> str:
     suffix = Path(upload.name).suffix or ".csv"
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
         handle.write(upload.getvalue())
+        logger.info("Saved uploaded file '%s' to %s", upload.name, handle.name)
         return handle.name
 
 
@@ -32,6 +37,8 @@ def _to_frame(rows: list[dict]) -> pd.DataFrame:
 
 def main() -> None:
     settings = load_settings()
+    configure_logging(settings.log_level)
+    logger.info("Starting Ops Weekly Summary app in %s environment", settings.app_env)
     st.title("Ops Weekly Summary")
     st.caption(
         f"Environment: {settings.app_env} | Test DB: {settings.test_database_url}"
@@ -45,6 +52,7 @@ def main() -> None:
         anchor_date = st.date_input("Week anchor date", value=date(2026, 1, 18))
 
     if not production_file or not shipping_file:
+        logger.info("Waiting for both production and shipping uploads")
         st.info("Upload both CSV files to generate the dashboard.")
         return
 
@@ -60,10 +68,21 @@ def main() -> None:
     result = consolidator.consolidate(
         [production_path, shipping_path], include_flagged=include_flagged
     )
+    logger.info(
+        "Consolidation completed with %d rows, %d needs-review rows, and %d errors",
+        len(result.rows),
+        len(result.needs_review),
+        len(result.errors),
+    )
 
     summary = WeeklySummaryGenerator().generate(result.rows, week_start, week_end)
     trending = TrendingCalculator().compute(
         result.rows, week_start, week_end, prev_start, prev_end
+    )
+    logger.info(
+        "Generated weekly outputs for %s through %s",
+        week_start.isoformat(),
+        week_end.isoformat(),
     )
 
     st.subheader("Weekly Line Ranking")
@@ -85,6 +104,7 @@ def main() -> None:
         {"ranking": summary["ranking"], "trending": trending["categories"]},
         "weekly_summary.xlsx",
     )
+    logger.info("Prepared downloadable summary files")
 
     st.download_button(
         "Download Weekly Summary CSV",
