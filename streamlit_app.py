@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import logging
+import os
 import tempfile
 from datetime import date, timedelta
 from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
+import sentry_sdk
 import streamlit as st
 
 from src.config import load_settings
@@ -37,6 +39,12 @@ def _to_frame(rows: list[dict]) -> pd.DataFrame:
 
 def main() -> None:
     settings = load_settings()
+    if dsn := os.getenv("SENTRY_DSN"):
+        sentry_sdk.init(
+            dsn=dsn,
+            traces_sample_rate=1.0,
+            environment=settings.app_env,
+        )
     configure_logging(settings.log_level)
     logger.info("Starting Ops Weekly Summary app in %s environment", settings.app_env)
     st.title("Ops Weekly Summary")
