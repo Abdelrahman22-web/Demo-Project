@@ -1,0 +1,15 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.pre-commit-cache
+.pytest_tmp
+tests/.artifacts
+.env
+.env.test
+.venv
+dist
+build
