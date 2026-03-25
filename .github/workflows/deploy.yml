@@ -1,27 +1,38 @@
-name: Deploy
+# The workflow file name typically determines the workflow's purpose
+# This workflow deploys the application to Render cloud platform
+name: Deploy to Render
 
+# Defines when this workflow should be triggered
+# This workflow runs after another workflow named "CI" completes
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]  # Only triggers when the "CI" workflow finishes
+    types:
+      - completed     # Wait for CI workflow to reach completion state
 
-concurrency:
-  group: deploy-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+# Permissions define what access this workflow has to GitHub resources
 permissions:
-  contents: read
+  contents: read      # Allows reading repository contents, needed for checking code
 
+# Jobs are the main building blocks of GitHub Actions workflows
 jobs:
-  render-deploy:
-    name: trigger Render deploy hook
-    runs-on: ubuntu-24.04
-    if: ${{ secrets.RENDER_DEPLOY_HOOK != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+  deploy:             # Job identifier (can have multiple jobs in one workflow)
+    name: Trigger Render deploy  # Human-readable job name displayed in GitHub UI
 
+    # Conditional logic to control when this job should execute
+    # Two conditions must be met:
+    # 1. The CI workflow succeeded (not failed or cancelled)
+    # 2. The CI workflow ran on the main branch (production branch)
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+
+    # Specifies the virtual machine environment for job execution
+    runs-on: ubuntu-24.04  # Uses Ubuntu 24.04 as the operating system
+
+    # Steps are sequential commands that perform the actual work
     steps:
-      - name: Trigger Render deploy
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        run: curl --fail --show-error --silent -X POST "$RENDER_DEPLOY_HOOK"
+      - name: Trigger Render Deploy Hook  # Step name for logging and debugging
+        # Uses curl command to send a POST request to Render's deploy hook URL
+        # This triggers a new deployment on Render's platform
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
