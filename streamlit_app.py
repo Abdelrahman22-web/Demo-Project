@@ -37,14 +37,26 @@ def _to_frame(rows: list[dict]) -> pd.DataFrame:
     return pd.DataFrame(rows) if rows else pd.DataFrame()
 
 
+def _trigger_sentry_test_error() -> None:
+    try:
+        raise ZeroDivisionError("Triggering test error for Sentry verification")
+    except ZeroDivisionError as exc:
+        logger.exception("Triggering test error for Sentry verification")
+        sentry_sdk.capture_exception(exc)
+        sentry_sdk.flush(timeout=5)
+        raise
+
+
 def main() -> None:
     settings = load_settings()
+    sentry_enabled = False
     if dsn := os.getenv("SENTRY_DSN"):
         sentry_sdk.init(
             dsn=dsn,
             traces_sample_rate=1.0,
             environment=settings.app_env,
         )
+        sentry_enabled = True
     configure_logging(settings.log_level)
     logger.info("Starting Ops Weekly Summary app in %s environment", settings.app_env)
     st.title("Ops Weekly Summary")
@@ -54,6 +66,8 @@ def main() -> None:
 
     with st.sidebar:
         st.header("Inputs")
+        if sentry_enabled and st.button("Trigger Sentry test error"):
+            _trigger_sentry_test_error()
         production_file = st.file_uploader("Production CSV", type=["csv"])
         shipping_file = st.file_uploader("Shipping CSV", type=["csv"])
         include_flagged = st.checkbox("Include Needs Review rows", value=False)

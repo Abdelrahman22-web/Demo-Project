@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  render-deploy:
+    name: trigger Render deploy hook
+    runs-on: ubuntu-24.04
+    if: ${{ secrets.RENDER_DEPLOY_HOOK != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+
+    steps:
+      - name: Trigger Render deploy
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl --fail --show-error --silent -X POST "$RENDER_DEPLOY_HOOK"

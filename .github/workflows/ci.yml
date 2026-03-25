@@ -216,3 +216,15 @@ jobs:
         #
         run: |
           poetry run pre-commit run --all-files --show-diff-on-failure --color=always
+
+  docker-build:
+    name: docker build
+    runs-on: ubuntu-24.04
+    needs: precommit
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build Docker image
+        run: docker build --tag demo-project:${{ github.sha }} .
