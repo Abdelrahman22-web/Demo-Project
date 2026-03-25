@@ -1,4 +1,4 @@
-"""Configuration helpers for local and test environments."""
+"""Configuration helpers for local and test environments"""
 
 from __future__ import annotations
 
