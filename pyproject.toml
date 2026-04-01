@@ -9,7 +9,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-streamlit = "^1.55.0"
+streamlit = "^1.56.0"
 pandas = "^2.3.3"
 sentry-sdk = "^2.26.1"
 openpyxl = "^3.1.5"
